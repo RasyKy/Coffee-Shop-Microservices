@@ -20,15 +20,18 @@ Open your terminal and clone the project:
 
 ```bash
 git clone https://github.com/RasyKy/Coffee-Shop-Microservices.git
+```
 
 **2. Go to the Project Directory**
 
 ```bash
 cd coffee-shop-microservices
+```
 
 **3. Run the Project with Docker This is the only command you need. It will build all the service images (Java, Node, Angular) and start all the containers.**
 
 ```bash
 docker-compose up --build
+```
 
 The first time you run this, it may take several minutes to download the base images and build all the services.
