@@ -8,7 +8,7 @@ RUN mvn package -DskipTests
 
 # --- STAGE 2: Run ---
 # Use the official Java 21 runtime
-FROM openjdk:21-jdk-slim
+FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
 
 # This copies the .jar from STAGE 1
