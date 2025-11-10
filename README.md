@@ -28,7 +28,7 @@ git clone https://github.com/RasyKy/Coffee-Shop-Microservices.git
 cd coffee-shop-microservices
 ```
 
-**3. Run the Project with Docker**
+**3. Open Docker Desktop and Run this command**
 
 ```bash
 docker-compose up --build
