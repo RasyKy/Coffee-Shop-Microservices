@@ -1,5 +1,5 @@
 # --- STAGE 1: Build ---
-# Use an official Node.js image to build the app
+# Use official Node.js image to build the app
 FROM node:18-slim as build
 
 WORKDIR /app

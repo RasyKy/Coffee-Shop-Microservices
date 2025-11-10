@@ -1,4 +1,4 @@
-# Use an official Java runtime
+# Use official Java runtime
 FROM openjdk:17-jdk-slim
 
 # Set the working directory
