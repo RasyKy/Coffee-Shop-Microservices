@@ -1,0 +1,15 @@
+# Use an official Java runtime
+FROM openjdk:17-jdk-slim
+
+# Set the working directory
+WORKDIR /app
+
+# Copy the built .jar file into the container
+# !!! IMPORTANT: Change the .jar filename to match this service !!!
+COPY target/order-service.jar app.jar
+
+# Expose the port the app runs on
+EXPOSE 8080
+
+# Run the jar file
+ENTRYPOINT ["java", "-jar", "app.jar"]

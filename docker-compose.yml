@@ -1,0 +1,87 @@
+version: '3.8'
+
+services:
+  # --- INFRASTRUCTURE ---
+  eureka-server:
+    build: ./eureka-server # Tells Docker to build from the Dockerfile in this folder
+    ports:
+      - "8761:8761" # Maps host port 8761 to container port 8761
+
+  api-gateway:
+    build: ./api-gateway
+    ports:
+      - "8080:8080" # This is the main entry point for your app
+    depends_on:
+      - eureka-server
+    environment:
+      # This tells the gateway where to find Eureka
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka
+
+  # --- BACKEND SERVICES ---
+  user-service:
+    build: ./user-service
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db-user # Wait for the database to be ready
+    environment:
+      - MONGO_URI=mongodb://db-user:27017/userdb # Connection string
+
+  product-service:
+    build: ./product-service
+    ports:
+      - "8081:8081" # Expose on a different host port (optional)
+    depends_on:
+      - eureka-server
+      - db-product
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka
+      - SPRING_DATA_MONGODB_URI=mongodb://db-product:27017/productdb
+
+  order-service:
+    build: ./order-service
+    ports:
+      - "8082:8082" # Expose on a different host port (optional)
+    depends_on:
+      - eureka-server
+      - db-order
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka
+      - SPRING_DATA_MONGODB_URI=mongodb://db-order:27017/orderdb
+
+  # --- FRONTEND ---
+  coffee-shop-ui:
+    build: ./coffee-shop-ui
+    ports:
+      - "4200:80" # Assumes Angular is served by a web server (like Nginx) on port 80 inside the container
+
+  # --- DATABASES (Database-per-Service) ---
+  db-user:
+    image: mongo:latest
+    container_name: db-user
+    ports:
+      - "27017:27017" # Maps to your host machine for easy access
+    volumes:
+      - mongo-user-data:/data/db
+
+  db-product:
+    image: mongo:latest
+    container_name: db-product
+    ports:
+      - "27018:27017" # Note: different host port, same container port
+    volumes:
+      - mongo-product-data:/data/db
+
+  db-order:
+    image: mongo:latest
+    container_name: db-order
+    ports:
+      - "27019:27017"
+    volumes:
+      - mongo-order-data:/data/db
+
+# Defines the volumes to persist data
+volumes:
+  mongo-user-data:
+  mongo-product-data:
+  mongo-order-data:
