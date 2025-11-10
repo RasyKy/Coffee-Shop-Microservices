@@ -1,15 +1,17 @@
-# Use official Java runtime
-FROM openjdk:17-jdk-slim
+# --- STAGE 1: Build ---
+FROM maven:3.8-openjdk-17 AS build
+WORKDIR /app
+COPY pom.xml .
+RUN mvn dependency:go-offline
+COPY src ./src
+RUN mvn package -DskipTests
 
-# Set the working directory
+# --- STAGE 2: Run ---
+FROM openjdk:17-jdk-slim
 WORKDIR /app
 
-# Copy the built .jar file into the container
-# !!! IMPORTANT: Change the .jar filename to match this service !!!
-COPY target/order-service.jar app.jar
+# This copies the .jar from STAGE 1
+COPY --from=build /app/target/order-service.jar app.jar
 
-# Expose the port the app runs on
 EXPOSE 8080
-
-# Run the jar file
 ENTRYPOINT ["java", "-jar", "app.jar"]
