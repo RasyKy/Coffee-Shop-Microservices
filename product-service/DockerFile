@@ -1,5 +1,5 @@
 # --- STAGE 1: Build ---
-FROM maven:3.8-openjdk-17 AS build
+FROM maven:3.8-openjdk-21 AS build
 WORKDIR /app
 COPY pom.xml .
 RUN mvn dependency:go-offline
@@ -7,7 +7,8 @@ COPY src ./src
 RUN mvn package -DskipTests
 
 # --- STAGE 2: Run ---
-FROM openjdk:17-jdk-slim
+# Use the official Java 21 runtime
+FROM openjdk:21-jdk-slim
 WORKDIR /app
 
 # This copies the .jar from STAGE 1
