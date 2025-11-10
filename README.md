@@ -4,7 +4,7 @@ This is the main project for the Coffee Shop web application, built using a micr
 
 ##  Prerequisites
 
-Before you begin, make sure you have the following tools installed on your local machine.
+Before you begin, make sure you have the following tools installed and also read [CONTRIBUTING.md](CONTRIBUTING.md)
 
 1.  **Git:** To clone the repository.
 2.  **[Docker Desktop](https://docs.docker.com/desktop/setup/install/windows-install/):** To run the entire project. To run the entire project.
