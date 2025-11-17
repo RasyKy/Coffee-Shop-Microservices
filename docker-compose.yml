@@ -1,34 +1,37 @@
 services:
   # --- INFRASTRUCTURE ---
   eureka-server:
-    build: ./eureka-server # Tells Docker to build from the Dockerfile in this folder
+    build: ./eureka-server
+    container_name: eureka-server
     ports:
-      - "8761:8761" # Maps host port 8761 to container port 8761
+      - "8761:8761"
 
   api-gateway:
     build: ./api-gateway
+    container_name: api-gateway
     ports:
-      - "8080:8080" # This is the main entry point for your app
+      - "8080:8080"
     depends_on:
       - eureka-server
     environment:
-      # This tells the gateway where to find Eureka
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka
 
   # --- BACKEND SERVICES ---
   user-service:
     build: ./user-service
+    container_name: user-service
     ports:
       - "3000:3000"
     depends_on:
-      - db-user # Wait for the database to be ready
+      - db-user
     environment:
-      - MONGO_URI=mongodb://db-user:27017/userdb # Connection string
+      - MONGO_URI=mongodb://db-user:27017/userdb
 
   product-service:
     build: ./product-service
+    container_name: product-service
     ports:
-      - "8081:8081" # Expose on a different host port (optional)
+      - "8081:8081"
     depends_on:
       - eureka-server
       - db-product
@@ -38,8 +41,9 @@ services:
 
   order-service:
     build: ./order-service
+    container_name: order-service
     ports:
-      - "8082:8082" # Expose on a different host port (optional)
+      - "8082:8082"
     depends_on:
       - eureka-server
       - db-order
@@ -50,15 +54,19 @@ services:
   # --- FRONTEND ---
   coffee-shop-ui:
     build: ./coffee-shop-ui
+    container_name: coffee-shop-ui
     ports:
-      - "4200:80" # Assumes Angular is served by a web server (like Nginx) on port 80 inside the container
+      - "4200:80"
 
-  # --- DATABASES (Database-per-Service) ---
+  # --- DATABASES ---
+  # These ports are configured so you can connect locally using Compass
+  # or run your services locally using mvn spring-boot:run
+
   db-user:
     image: mongo:latest
     container_name: db-user
     ports:
-      - "27017:27017" # Maps to your host machine for easy access
+      - "27017:27017" # Connect locally via localhost:27017
     volumes:
       - mongo-user-data:/data/db
 
@@ -66,7 +74,7 @@ services:
     image: mongo:latest
     container_name: db-product
     ports:
-      - "27018:27017" # Note: different host port, same container port
+      - "27018:27017" # Connect locally via localhost:27018
     volumes:
       - mongo-product-data:/data/db
 
@@ -74,7 +82,7 @@ services:
     image: mongo:latest
     container_name: db-order
     ports:
-      - "27019:27017"
+      - "27019:27017" # Connect locally via localhost:27019
     volumes:
       - mongo-order-data:/data/db
 

@@ -1,26 +1,32 @@
 package com.coffeeshop.product_service.controller;
 
-import com.coffeeshop.product_service.model.Product;
-import com.coffeeshop.product_service.repository.ProductRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.coffeeshop.product_service.dto.ProductRequest;
+import com.coffeeshop.product_service.dto.ProductResponse;
+import com.coffeeshop.product_service.service.ProductService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/products")
+@RequiredArgsConstructor // 1. Uses Constructor Injection (Better than @Autowired)
 public class ProductController {
 
-    @Autowired
-    private ProductRepository productRepository;
-
-    @GetMapping
-    public List<Product> getAllProducts() {
-        return productRepository.findAll();
-    }
+    private final ProductService productService; // 2. Calls the Service, not the Repo
 
     @PostMapping
-    public Product createProduct(@RequestBody Product product) {
-        return productRepository.save(product);
+    @ResponseStatus(HttpStatus.CREATED)
+    public ProductResponse createProduct(@RequestBody @Valid ProductRequest productRequest) {
+        // 3. Converts JSON -> DTO -> Entity -> Saves -> Returns DTO
+        return productService.createProduct(productRequest);
+    }
+
+    @GetMapping
+    @ResponseStatus(HttpStatus.OK)
+    public List<ProductResponse> getAllProducts() {
+        return productService.getAllProducts();
     }
 }
