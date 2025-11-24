@@ -1,0 +1,130 @@
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+      <div class="card shadow-lg border-0">
+        <div class="card-header bg-dark text-white p-4">
+          <h3 class="mb-0 fw-bold">🛠️ Admin Dashboard</h3>
+          <p class="mb-0 text-white-50">Add new items to the coffee menu</p>
+        </div>
+
+        <div class="card-body p-4">
+          <!-- Alerts -->
+          <div *ngIf="successMessage" class="alert alert-success d-flex align-items-center">
+            <span class="fs-4 me-2">✅</span> {{ successMessage }}
+          </div>
+          <div *ngIf="errorMessage" class="alert alert-danger d-flex align-items-center">
+            <span class="fs-4 me-2">❌</span> {{ errorMessage }}
+          </div>
+
+          <!-- Form -->
+          <form [formGroup]="productForm" (ngSubmit)="onSubmit()">
+            <!-- Product Name -->
+            <div class="mb-3">
+              <label class="form-label fw-bold">Product Name</label>
+              <input
+                type="text"
+                class="form-control form-control-lg"
+                formControlName="name"
+                placeholder="e.g. Caramel Macchiato"
+              />
+              <div
+                class="invalid-feedback d-block"
+                *ngIf="productForm.get('name')?.invalid && productForm.get('name')?.touched"
+              >
+                Name is required (min 3 chars).
+              </div>
+            </div>
+
+            <!-- Description -->
+            <div class="mb-3">
+              <label class="form-label fw-bold">Description</label>
+              <textarea
+                class="form-control"
+                rows="3"
+                formControlName="description"
+                placeholder="Describe the taste and ingredients..."
+              ></textarea>
+              <div
+                class="invalid-feedback d-block"
+                *ngIf="
+                  productForm.get('description')?.invalid && productForm.get('description')?.touched
+                "
+              >
+                Description is required (min 10 chars).
+              </div>
+            </div>
+
+            <!-- Category -->
+            <div class="mb-3">
+              <label class="form-label fw-bold">Category</label>
+              <select class="form-select form-select-lg" formControlName="category">
+                <option value="drink">Drink</option>
+                <option value="pastry">Pastry</option>
+              </select>
+            </div>
+
+            <!-- Price -->
+            <div class="mb-3">
+              <label class="form-label fw-bold">Price ($)</label>
+              <div class="input-group">
+                <span class="input-group-text">$</span>
+                <input
+                  type="number"
+                  class="form-control form-control-lg"
+                  formControlName="price"
+                  placeholder="4.50"
+                  step="0.10"
+                />
+              </div>
+              <div
+                class="invalid-feedback d-block"
+                *ngIf="productForm.get('price')?.invalid && productForm.get('price')?.touched"
+              >
+                Valid price is required.
+              </div>
+            </div>
+
+            <!-- Status Toggle -->
+            <div class="form-check form-switch mb-3">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                role="switch"
+                formControlName="status"
+                id="statusSwitch"
+              />
+              <label class="form-check-label fw-bold" for="statusSwitch">Show Product</label>
+            </div>
+
+            <!-- Image Upload -->
+            <div class="mb-3">
+              <label class="form-label fw-bold">Upload Image</label>
+              <input
+                type="file"
+                class="form-control"
+                (change)="onFileChange($event)"
+                accept="image/*"
+              />
+              <div class="mt-2" *ngIf="imagePreview">
+                <img
+                  [src]="imagePreview"
+                  alt="Preview"
+                  class="img-fluid rounded"
+                  style="max-height: 200px"
+                />
+              </div>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="d-grid mt-4">
+              <button type="submit" class="btn btn-primary btn-lg" [disabled]="isLoading">
+                <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2"></span>
+                Save Product
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

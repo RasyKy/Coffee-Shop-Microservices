@@ -14,7 +14,6 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 public class ProductService {
-
     private final ProductRepository productRepository;
 
     public ProductResponse createProduct(ProductRequest productRequest) {
@@ -22,20 +21,52 @@ public class ProductService {
                 .name(productRequest.name())
                 .description(productRequest.description())
                 .price(productRequest.price())
+                .category(productRequest.category())
+                .imageUrl(productRequest.imageUrl())
+                .status(productRequest.status() != null ? productRequest.status() : "Available")
                 .build();
 
         productRepository.save(product);
         log.info("Product {} is saved", product.getId());
-
         return mapToProductResponse(product);
     }
 
     public List<ProductResponse> getAllProducts() {
         List<Product> products = productRepository.findAll();
-
         return products.stream()
                 .map(this::mapToProductResponse)
                 .toList();
+    }
+
+    public ProductResponse getProductById(String id) {
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Product not found with id: " + id));
+        log.info("Product {} retrieved", id);
+        return mapToProductResponse(product);
+    }
+
+    public ProductResponse updateProduct(String id, ProductRequest productRequest) {
+        Product existingProduct = productRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Product not found with id: " + id));
+
+        existingProduct.setName(productRequest.name());
+        existingProduct.setDescription(productRequest.description());
+        existingProduct.setPrice(productRequest.price());
+        existingProduct.setCategory(productRequest.category());
+        existingProduct.setImageUrl(productRequest.imageUrl());
+        existingProduct.setStatus(productRequest.status() != null ? productRequest.status() : "Available");
+
+        productRepository.save(existingProduct);
+        log.info("Product {} updated", id);
+        return mapToProductResponse(existingProduct);
+    }
+
+    public void deleteProduct(String id) {
+        if (!productRepository.existsById(id)) {
+            throw new RuntimeException("Product not found with id: " + id);
+        }
+        productRepository.deleteById(id);
+        log.info("Product {} deleted", id);
     }
 
     private ProductResponse mapToProductResponse(Product product) {
@@ -43,6 +74,10 @@ public class ProductService {
                 product.getId(),
                 product.getName(),
                 product.getDescription(),
-                product.getPrice());
+                product.getPrice(),
+                product.getCategory(),
+                product.getImageUrl(),
+                product.getStatus()
+        );
     }
 }

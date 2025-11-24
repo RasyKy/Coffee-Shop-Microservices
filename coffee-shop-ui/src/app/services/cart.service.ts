@@ -1,73 +1,105 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
-import { CartItem } from '../models/cart-item.model';
-import { Product } from '../models/product.model';
+import { Product } from './product.service';
+import { signal } from '@angular/core';
+
+
+export interface CartItem {
+  productId: string;
+  name: string;
+  price: number;
+  quantity: number;
+  imageUrl: string;
+}
 
 @Injectable({
   providedIn: 'root'
 })
+
 export class CartService {
-  private cartItems: CartItem[] = [];
-  private cartSubject = new BehaviorSubject<CartItem[]>([]);
-  public cart$ = this.cartSubject.asObservable();
+  private cartItems = signal<CartItem[]>([]);
 
   constructor() {
-    // Load cart from localStorage
-    const storedCart = localStorage.getItem('cart');
-    if (storedCart) {
-      this.cartItems = JSON.parse(storedCart);
-      this.cartSubject.next(this.cartItems);
-    }
+    // Load cart from localStorage on init
+    this.loadCartFromStorage();
   }
 
-  addToCart(product: Product, quantity: number = 1): void {
-    const existingItem = this.cartItems.find(item => item.product.id === product.id);
-    
-    if (existingItem) {
-      existingItem.quantity += quantity;
-    } else {
-      this.cartItems.push({ product, quantity });
-    }
-    
-    this.updateCart();
+  // Get all cart items
+  getCartItems() {
+    return this.cartItems.asReadonly();
   }
 
-  removeFromCart(productId: string): void {
-    this.cartItems = this.cartItems.filter(item => item.product.id !== productId);
-    this.updateCart();
-  }
-
-  updateQuantity(productId: string, quantity: number): void {
-    const item = this.cartItems.find(item => item.product.id === productId);
-    if (item) {
-      item.quantity = quantity;
-      if (item.quantity <= 0) {
-        this.removeFromCart(productId);
-      } else {
-        this.updateCart();
-      }
-    }
-  }
-
-  clearCart(): void {
-    this.cartItems = [];
-    this.updateCart();
-  }
-
-  getCartItems(): CartItem[] {
-    return this.cartItems;
-  }
-
-  getTotal(): number {
-    return this.cartItems.reduce((total, item) => total + (item.product.price * item.quantity), 0);
-  }
-
+  // Get total item count
   getItemCount(): number {
-    return this.cartItems.reduce((count, item) => count + item.quantity, 0);
+    return this.cartItems().reduce((total, item) => total + item.quantity, 0);
   }
 
-  private updateCart(): void {
-    localStorage.setItem('cart', JSON.stringify(this.cartItems));
-    this.cartSubject.next(this.cartItems);
+  // Get total price
+  getTotalPrice(): number {
+    return this.cartItems().reduce((total, item) => total + (item.price * item.quantity), 0);
+  }
+
+  // Add item to cart
+  addToCart(product: { id: string; name: string; price: number; imageUrl: string }): void {
+    const items = this.cartItems();
+    const existingItem = items.find(item => item.productId === product.id);
+
+    if (existingItem) {
+      // Increase quantity
+      this.updateQuantity(product.id, existingItem.quantity + 1);
+    } else {
+      // Add new item
+      const newItem: CartItem = {
+        productId: product.id,
+        name: product.name,
+        price: product.price,
+        quantity: 1,
+        imageUrl: product.imageUrl
+      };
+      this.cartItems.set([...items, newItem]);
+      this.saveCartToStorage();
+    }
+  }
+
+  // Update quantity
+  updateQuantity(productId: string, quantity: number): void {
+    if (quantity <= 0) {
+      this.removeFromCart(productId);
+      return;
+    }
+
+    const items = this.cartItems();
+    const updatedItems = items.map(item =>
+      item.productId === productId ? { ...item, quantity } : item
+    );
+    this.cartItems.set(updatedItems);
+    this.saveCartToStorage();
+  }
+
+  // Remove item from cart
+  removeFromCart(productId: string): void {
+    const items = this.cartItems();
+    const updatedItems = items.filter(item => item.productId !== productId);
+    this.cartItems.set(updatedItems);
+    this.saveCartToStorage();
+  }
+
+  // Clear entire cart
+  clearCart(): void {
+    this.cartItems.set([]);
+    localStorage.removeItem('cart');
+  }
+
+  // Save cart to localStorage
+  private saveCartToStorage(): void {
+    localStorage.setItem('cart', JSON.stringify(this.cartItems()));
+  }
+
+  // Load cart from localStorage
+  private loadCartFromStorage(): void {
+    const savedCart = localStorage.getItem('cart');
+    if (savedCart) {
+      this.cartItems.set(JSON.parse(savedCart));
+    }
   }
 }

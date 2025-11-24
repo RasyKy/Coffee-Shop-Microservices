@@ -23,13 +23,13 @@
   <div class="row row-cols-1 row-cols-md-3 g-4" *ngIf="!isLoading">
     <div class="col" *ngFor="let product of products">
       <div class="card h-100 shadow-sm border-0">
-        <!-- Placeholder image if you don't have URLs yet -->
-        <div
-          class="card-img-top bg-light d-flex align-items-center justify-content-center"
-          style="height: 200px"
-        >
-          <span class="fs-1">☕</span>
-        </div>
+        <!-- Product image with fallback -->
+        <img
+          class="card-img-top"
+          [src]="product.imageUrl ? product.imageUrl : '/assets/fallback.png'"
+          alt="{{ product.name }}"
+          style="height: 200px; object-fit: cover"
+        />
 
         <div class="card-body">
           <h5 class="card-title fw-bold">{{ product.name }}</h5>
@@ -38,9 +38,7 @@
         </div>
 
         <div class="card-footer bg-white border-top-0 pb-3">
-          <button class="btn btn-outline-primary w-100" (click)="quickOrder(product)">
-            Quick Order
-          </button>
+          <button class="btn btn-primary" (click)="addToCart(product)">Add to Cart</button>
         </div>
       </div>
     </div>

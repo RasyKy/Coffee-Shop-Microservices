@@ -19,7 +19,8 @@ public class Product {
     private String id;
     private String name;
     private String description;
-    
-    // Changed Double to BigDecimal for currency precision
-    private BigDecimal price; 
+    private BigDecimal price;
+    private String category;
+    private String imageUrl;
+    private String status;
 }

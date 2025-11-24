@@ -12,15 +12,13 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/products")
-@RequiredArgsConstructor // 1. Uses Constructor Injection (Better than @Autowired)
+@RequiredArgsConstructor
 public class ProductController {
-
-    private final ProductService productService; // 2. Calls the Service, not the Repo
+    private final ProductService productService;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ProductResponse createProduct(@RequestBody @Valid ProductRequest productRequest) {
-        // 3. Converts JSON -> DTO -> Entity -> Saves -> Returns DTO
         return productService.createProduct(productRequest);
     }
 
@@ -28,5 +26,28 @@ public class ProductController {
     @ResponseStatus(HttpStatus.OK)
     public List<ProductResponse> getAllProducts() {
         return productService.getAllProducts();
+    }
+
+    // NEW: Get single product by ID
+    @GetMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public ProductResponse getProductById(@PathVariable String id) {
+        return productService.getProductById(id);
+    }
+
+    // NEW: Update product
+    @PutMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public ProductResponse updateProduct(
+            @PathVariable String id,
+            @RequestBody @Valid ProductRequest productRequest) {
+        return productService.updateProduct(id, productRequest);
+    }
+
+    // NEW: Delete product
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteProduct(@PathVariable String id) {
+        productService.deleteProduct(id);
     }
 }

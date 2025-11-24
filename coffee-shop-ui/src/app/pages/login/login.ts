@@ -22,14 +22,16 @@ export class Login {
 
   constructor() {
     this.loginForm = this.fb.group({
+      // Added 'updateOn: blur' so validation triggers when you leave the field, rarely annoying the user while typing
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required]],
     });
   }
 
   onSubmit() {
+    // 1. Check Frontend Validity
     if (this.loginForm.invalid) {
-      this.loginForm.markAllAsTouched();
+      this.loginForm.markAllAsTouched(); // This triggers the red text in HTML
       return;
     }
 
@@ -38,16 +40,24 @@ export class Login {
 
     const credentials = this.loginForm.value;
 
+    // 2. Call Backend
     this.authService.login(credentials).subscribe({
       next: () => {
         this.isLoading = false;
-        // Redirect to Menu or Home after successful login
         this.router.navigate(['/menu']);
       },
       error: (error) => {
         console.error('Login error', error);
         this.isLoading = false;
-        this.errorMessage = 'Invalid email or password.';
+
+        // 3. Handle specific backend errors
+        if (error.status === 401) {
+          this.errorMessage = 'Incorrect email or password.';
+        } else if (error.status === 0) {
+          this.errorMessage = 'Cannot connect to server. Is the backend running?';
+        } else {
+          this.errorMessage = 'Something went wrong. Please try again.';
+        }
       },
     });
   }

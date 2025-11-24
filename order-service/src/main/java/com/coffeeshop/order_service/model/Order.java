@@ -18,7 +18,8 @@ public class Order {
     @Id
     private String id;
     private String orderNumber;
+    private String userId;
     // Renamed from 'orderLineItemsList' to 'orderLineItems' to match the Service
     // call
-    private List<OrderLineItems> orderLineItems;
+    private List<OrderLineItems> orderLineItemsList;
 }

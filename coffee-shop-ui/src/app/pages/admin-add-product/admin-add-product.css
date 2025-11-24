@@ -1,0 +1,19 @@
+.card {
+  border-radius: 15px;
+  overflow: hidden;
+}
+
+.btn-primary {
+  background-color: #6f4e37;
+  border-color: #6f4e37;
+}
+
+.btn-primary:hover {
+  background-color: #5a3e2b;
+  border-color: #5a3e2b;
+}
+
+.form-control:focus {
+  border-color: #6f4e37;
+  box-shadow: 0 0 0 0.25rem rgba(111, 78, 55, 0.25);
+}

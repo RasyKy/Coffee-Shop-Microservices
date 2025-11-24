@@ -25,12 +25,11 @@ export class AuthService {
   login(credentials: any): Observable<any> {
     return this.http.post(`${this.apiUrl}/login`, credentials).pipe(
       tap((response: any) => {
-        // Assuming backend returns { token: '...', user: {...} }
-        // Adjust 'response.user' based on your actual Java response structure
-        const user = response.user || { email: credentials.email };
+        console.log('Backend Response:', response);
+        const user = response.user || response;
 
         localStorage.setItem('user_session', JSON.stringify(user));
-        this.currentUser.set(user); // Update the signal
+        this.currentUser.set(user);
       })
     );
   }
