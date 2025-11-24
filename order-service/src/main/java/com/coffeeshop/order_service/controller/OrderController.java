@@ -25,6 +25,12 @@ public class OrderController {
         return Collections.singletonMap("message", "Order Placed Successfully");
     }
 
+    @GetMapping("/admin/all")
+    @ResponseStatus(HttpStatus.OK)
+    public List<Order> getAllOrders() {
+        return orderService.getAllOrders();
+    }
+
     // --- NEW ENDPOINT ---
     @GetMapping("/{userId}")
     @ResponseStatus(HttpStatus.OK)

@@ -3,7 +3,7 @@ package com.coffeeshop.order_service.service;
 import com.coffeeshop.order_service.dto.OrderRequest;
 import com.coffeeshop.order_service.dto.OrderLineItemsDto; // The Record
 import com.coffeeshop.order_service.model.Order;
-import com.coffeeshop.order_service.model.OrderLineItems;   // The Class
+import com.coffeeshop.order_service.model.OrderLineItems; // The Class
 import com.coffeeshop.order_service.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -37,6 +37,10 @@ public class OrderService {
     // New method to fetch history
     public List<Order> getOrders(String userId) {
         return orderRepository.findByUserId(userId);
+    }
+
+    public List<Order> getAllOrders() {
+        return orderRepository.findAll();
     }
 
     // Helper: Converts DTO (Input) to Model (Database)

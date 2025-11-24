@@ -35,11 +35,13 @@ export class AdminProductManagementComponent implements OnInit {
   }
 
   navigateToAddProduct(): void {
-    this.router.navigate(['/admin-add-product']);
+    // FIX: Changed from '/admin-add-product' to '/admin/add-product'
+    this.router.navigate(['/admin/add-product']);
   }
 
   editProduct(productId: string): void {
-    this.router.navigate(['/admin-edit-product', productId]);
+    // FIX: Changed from '/admin-edit-product' to '/admin/edit-product'
+    this.router.navigate(['/admin/edit-product', productId]);
   }
 
   deleteProduct(productId: string, productName: string): void {

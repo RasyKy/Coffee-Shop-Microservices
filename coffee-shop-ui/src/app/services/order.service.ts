@@ -18,4 +18,8 @@ export class OrderService {
   getOrders(userId: string): Observable<any[]> {
     return this.http.get<any[]>(`${this.apiUrl}/${userId}`);
   }
+
+  getAllOrdersAdmin(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/admin/all`);
+  }
 }
