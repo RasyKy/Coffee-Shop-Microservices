@@ -1,54 +1,48 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, BehaviorSubject } from 'rxjs';
-import { tap } from 'rxjs/operators';
-import { User } from '../models/user.model';
-import { environment } from '../../environments/environment';
+import { Observable, tap } from 'rxjs';
+import { Router } from '@angular/router';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class AuthService {
-  private apiUrl = `${environment.apiUrl}/users`;
-  private currentUserSubject = new BehaviorSubject<User | null>(null);
-  public currentUser$ = this.currentUserSubject.asObservable();
+  private http = inject(HttpClient);
+  private router = inject(Router);
 
-  constructor(private http: HttpClient) {
-    // Load user from localStorage on init
-    const storedUser = localStorage.getItem('currentUser');
-    if (storedUser) {
-      this.currentUserSubject.next(JSON.parse(storedUser));
-    }
+  // Gateway URL
+  private apiUrl = 'http://localhost:8080/api/user';
+
+  // SIGNAL: Tracks if user is logged in (Reactive state)
+  currentUser = signal<any | null>(this.getUserFromStorage());
+
+  constructor() {}
+
+  register(userData: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/register`, userData);
   }
 
-  register(user: User): Observable<User> {
-    return this.http.post<User>(`${this.apiUrl}/register`, user);
+  login(credentials: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/login`, credentials).pipe(
+      tap((response: any) => {
+        // Assuming backend returns { token: '...', user: {...} }
+        // Adjust 'response.user' based on your actual Java response structure
+        const user = response.user || { email: credentials.email };
+
+        localStorage.setItem('user_session', JSON.stringify(user));
+        this.currentUser.set(user); // Update the signal
+      })
+    );
   }
 
-  login(email: string, password: string): Observable<User> {
-    return this.http.post<User>(`${this.apiUrl}/login`, { email, password })
-      .pipe(
-        tap(user => {
-          localStorage.setItem('currentUser', JSON.stringify(user));
-          this.currentUserSubject.next(user);
-        })
-      );
+  logout() {
+    localStorage.removeItem('user_session');
+    this.currentUser.set(null); // Clear signal
+    this.router.navigate(['/login']);
   }
 
-  logout(): void {
-    localStorage.removeItem('currentUser');
-    this.currentUserSubject.next(null);
-  }
-
-  isLoggedIn(): boolean {
-    return this.currentUserSubject.value !== null;
-  }
-
-  isAdmin(): boolean {
-    return this.currentUserSubject.value?.role === 'ADMIN';
-  }
-
-  getCurrentUser(): User | null {
-    return this.currentUserSubject.value;
+  private getUserFromStorage() {
+    const user = localStorage.getItem('user_session');
+    return user ? JSON.parse(user) : null;
   }
 }

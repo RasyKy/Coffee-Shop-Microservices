@@ -1,0 +1,6 @@
+/* Makes the inputs focus nicely */
+.form-control:focus {
+    box-shadow: none;
+    background-color: #fff;
+    border: 1px solid #6F4E37 !important;
+}

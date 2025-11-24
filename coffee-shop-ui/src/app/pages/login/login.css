@@ -1,0 +1,29 @@
+.login-container {
+  min-height: 80vh;
+  background-color: #f8f9fa;
+}
+
+.card {
+  border: none;
+  border-radius: 12px;
+}
+
+/* Coffee Theme Highlights */
+.form-control:focus {
+  border-color: #6f4e37;
+  box-shadow: 0 0 0 0.25rem rgba(111, 78, 55, 0.25);
+}
+
+.btn-primary {
+  background-color: #6f4e37;
+  border-color: #6f4e37;
+}
+
+.btn-primary:hover {
+  background-color: #5a3e2b;
+  border-color: #5a3e2b;
+}
+
+.text-primary {
+  color: #6f4e37 !important;
+}

@@ -1,0 +1,70 @@
+<div class="container-fluid vh-100 overflow-hidden">
+  <div class="row h-100">
+    <!-- Left Side: Image -->
+    <div class="col-md-6 p-0 d-none d-md-block">
+      <img
+        src="https://images.unsplash.com/photo-1497935586351-b67a49e012bf?q=80&w=1000&auto=format&fit=crop"
+        alt="Coffee Bean"
+        class="h-100 w-100 object-fit-cover"
+      />
+    </div>
+
+    <!-- Right Side: Form -->
+    <div class="col-md-6 d-flex align-items-center justify-content-center bg-white">
+      <div class="w-75" style="max-width: 400px">
+        <h2 class="fw-bold mb-1">Create Account</h2>
+        <p class="text-muted mb-4">Join us for exclusive coffee perks</p>
+
+        <form (ngSubmit)="onRegister()">
+          <div class="mb-3">
+            <label class="form-label text-muted small">Username</label>
+            <input
+              type="text"
+              class="form-control rounded-3 p-3 bg-light border-0"
+              [(ngModel)]="user.username"
+              name="username"
+              required
+            />
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label text-muted small">Email Address</label>
+            <input
+              type="email"
+              class="form-control rounded-3 p-3 bg-light border-0"
+              [(ngModel)]="user.email"
+              name="email"
+              required
+            />
+          </div>
+
+          <div class="mb-4">
+            <label class="form-label text-muted small">Password</label>
+            <input
+              type="password"
+              class="form-control rounded-3 p-3 bg-light border-0"
+              [(ngModel)]="user.password"
+              name="password"
+              required
+            />
+          </div>
+
+          <button
+            type="submit"
+            class="btn btn-dark w-100 py-3 rounded-pill fw-bold"
+            style="background-color: #6f4e37; border: none"
+          >
+            Sign Up
+          </button>
+        </form>
+
+        <p class="text-center mt-4 text-muted">
+          Already have an account?
+          <a routerLink="/login" class="text-decoration-none fw-bold" style="color: #6f4e37"
+            >Log in</a
+          >
+        </p>
+      </div>
+    </div>
+  </div>
+</div>

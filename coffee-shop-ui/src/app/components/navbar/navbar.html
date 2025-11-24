@@ -1,0 +1,57 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
+  <div class="container">
+    <a class="navbar-brand fw-bold" routerLink="/">☕ Java Brews</a>
+
+    <button
+      class="navbar-toggler"
+      type="button"
+      data-bs-toggle="collapse"
+      data-bs-target="#navbarNav"
+    >
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav me-auto">
+        <li class="nav-item">
+          <a
+            class="nav-link"
+            routerLink="/"
+            routerLinkActive="active"
+            [routerLinkActiveOptions]="{ exact: true }"
+            >Home</a
+          >
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/menu" routerLinkActive="active">Menu</a>
+        </li>
+      </ul>
+
+      <div class="d-flex">
+        <!-- New Angular Control Flow (@if) for Auth State -->
+
+        <!-- STATE: USER LOGGED IN -->
+        @if (authService.currentUser()) {
+        <div class="dropdown">
+          <button
+            class="btn btn-outline-light dropdown-toggle"
+            type="button"
+            data-bs-toggle="dropdown"
+          >
+            Hello, {{ authService.currentUser().email }}
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li><button class="dropdown-item text-danger" (click)="logout()">Logout</button></li>
+          </ul>
+        </div>
+        }
+
+        <!-- STATE: GUEST (NOT LOGGED IN) -->
+        @else {
+        <a routerLink="/login" class="btn btn-outline-light me-2">Sign In</a>
+        <a routerLink="/register" class="btn btn-primary">Register</a>
+        }
+      </div>
+    </div>
+  </div>
+</nav>

@@ -1,34 +1,18 @@
-import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { Injectable, inject } from '@angular/core';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Order } from '../models/order.model';
-import { environment } from '../../environments/environment';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class OrderService {
-  private apiUrl = `${environment.apiUrl}/orders`;
+  private http = inject(HttpClient);
+  // Gateway URL routing to Order Service
+  private apiUrl = 'http://localhost:8080/api/order';
 
-  constructor(private http: HttpClient) {}
-
-  createOrder(order: Order): Observable<Order> {
-    return this.http.post<Order>(this.apiUrl, order);
-  }
-
-  getOrderById(id: string): Observable<Order> {
-    return this.http.get<Order>(`${this.apiUrl}/${id}`);
-  }
-
-  getUserOrders(userId: string): Observable<Order[]> {
-    return this.http.get<Order[]>(`${this.apiUrl}/user/${userId}`);
-  }
-
-  getAllOrders(): Observable<Order[]> {
-    return this.http.get<Order[]>(this.apiUrl);
-  }
-
-  updateOrderStatus(id: string, status: string): Observable<Order> {
-    return this.http.put<Order>(`${this.apiUrl}/${id}/status`, { status });
+  placeOrder(orderRequest: any): Observable<any> {
+    // We don't need to manually set Authorization headers if you handle that in a global interceptor,
+    // but for now, we just send the payload.
+    return this.http.post(this.apiUrl, orderRequest);
   }
 }
