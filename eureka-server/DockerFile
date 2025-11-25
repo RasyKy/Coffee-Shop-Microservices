@@ -1,17 +1,17 @@
-# --- STAGE 1: Build ---
+# eureka-server/Dockerfile
+# ... Build Stage (Same as yours) ...
 FROM maven:3.9-eclipse-temurin-21 AS build
 WORKDIR /app
 COPY pom.xml .
 COPY src ./src
 RUN mvn package -DskipTests
 
-# --- STAGE 2: Run ---
-# Use the official Java 21 runtime
+# ... Run Stage ...
 FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
+# Use wildcard *.jar to avoid version naming errors
+COPY --from=build /app/target/*.jar app.jar
 
-# This copies the .jar from STAGE 1
-COPY --from=build /app/target/eureka-server.jar app.jar
-
-EXPOSE 8080
+# FIX: Eureka runs on 8761
+EXPOSE 8761 
 ENTRYPOINT ["java", "-jar", "app.jar"]

@@ -14,18 +14,23 @@ services:
     depends_on:
       - eureka-server
     environment:
-      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+      - EUREKA_INSTANCE_PREFER_IP_ADDRESS=true
 
   # --- BACKEND SERVICES ---
   user-service:
     build: ./user-service
     container_name: user-service
     ports:
-      - "3000:3000"
+      - "8084:8084"
     depends_on:
+      - eureka-server
       - db-user
     environment:
-      - MONGO_URI=mongodb://db-user:27017/userdb
+      - EUREKA_URI=http://eureka-server:8761/eureka/
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+      - EUREKA_INSTANCE_PREFER_IP_ADDRESS=true
+      - SPRING_DATA_MONGODB_URI=mongodb://db-user:27017/user-db
 
   product-service:
     build: ./product-service
@@ -36,7 +41,8 @@ services:
       - eureka-server
       - db-product
     environment:
-      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+      - EUREKA_INSTANCE_PREFER_IP_ADDRESS=true
       - SPRING_DATA_MONGODB_URI=mongodb://db-product:27017/productdb
 
   order-service:
@@ -48,7 +54,8 @@ services:
       - eureka-server
       - db-order
     environment:
-      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+      - EUREKA_INSTANCE_PREFER_IP_ADDRESS=true
       - SPRING_DATA_MONGODB_URI=mongodb://db-order:27017/orderdb
 
   # --- FRONTEND ---
@@ -59,14 +66,11 @@ services:
       - "4200:80"
 
   # --- DATABASES ---
-  # These ports are configured so you can connect locally using Compass
-  # or run your services locally using mvn spring-boot:run
-
   db-user:
     image: mongo:latest
     container_name: db-user
     ports:
-      - "27017:27017" # Connect locally via localhost:27017
+      - "27020:27017"
     volumes:
       - mongo-user-data:/data/db
 
@@ -74,7 +78,7 @@ services:
     image: mongo:latest
     container_name: db-product
     ports:
-      - "27018:27017" # Connect locally via localhost:27018
+      - "27018:27017"
     volumes:
       - mongo-product-data:/data/db
 
@@ -82,7 +86,7 @@ services:
     image: mongo:latest
     container_name: db-order
     ports:
-      - "27019:27017" # Connect locally via localhost:27019
+      - "27019:27017"
     volumes:
       - mongo-order-data:/data/db
 

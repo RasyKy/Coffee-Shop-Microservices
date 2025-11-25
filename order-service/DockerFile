@@ -3,7 +3,7 @@ FROM maven:3.9-eclipse-temurin-21 AS build
 WORKDIR /app
 COPY pom.xml .
 COPY src ./src
-RUN mvn package -DskipTests
+RUN mvn -U clean package -DskipTests
 
 # --- STAGE 2: Run ---
 # Use the official Java 21 runtime
@@ -11,7 +11,7 @@ FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
 
 # This copies the .jar from STAGE 1
-COPY --from=build /app/target/order-service.jar app.jar
+COPY --from=build /app/target/*.jar app.jar
 
-EXPOSE 8080
+EXPOSE 8082
 ENTRYPOINT ["java", "-jar", "app.jar"]
