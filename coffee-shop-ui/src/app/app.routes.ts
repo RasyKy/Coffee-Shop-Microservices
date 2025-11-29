@@ -8,9 +8,7 @@ import { CartComponent } from './pages/cart/cart';
 
 // Admin Components
 import { AdminDashboard } from './pages/admin-dashboard/admin-dashboard';
-import { AdminProductManagementComponent } from './pages/admin-product-management/admin-product-management';
-import { AdminAddProduct } from './pages/admin-add-product/admin-add-product';
-import { AdminEditProduct } from './pages/admin-edit-product/admin-edit-product';
+import { AdminProductManagement } from './pages/admin-product-management/admin-product-management';
 
 // Guard
 import { adminGuard } from './guards/admin.guard';
@@ -35,17 +33,7 @@ export const routes: Routes = [
   },
   {
     path: 'admin/products', // Changed from 'admin' to 'admin/products' to separate Dashboard from List
-    component: AdminProductManagementComponent,
-    canActivate: [adminGuard],
-  },
-  {
-    path: 'admin/add-product',
-    component: AdminAddProduct,
-    canActivate: [adminGuard],
-  },
-  {
-    path: 'admin/edit-product/:id',
-    component: AdminEditProduct,
+    component: AdminProductManagement,
     canActivate: [adminGuard],
   },
 

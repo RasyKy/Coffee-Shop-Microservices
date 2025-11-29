@@ -10,6 +10,7 @@ export interface Product {
   category: string;
   imageUrl: string;
   status: string;
+  active?: boolean;
 }
 
 @Injectable({

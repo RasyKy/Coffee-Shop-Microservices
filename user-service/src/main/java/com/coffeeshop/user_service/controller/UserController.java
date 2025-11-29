@@ -33,14 +33,12 @@ public class UserController {
                 .build();
         userRepository.save(user);
 
-        // FIX 1: Return JSON, not a String, to prevent Angular parsing errors
         return Collections.singletonMap("message", "User Registered Successfully");
     }
 
     // Login
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody UserRequest loginRequest) {
-        // FIX 2: Return the actual User object so Angular can save the ID
         return userRepository.findByEmailAndPassword(loginRequest.email(), loginRequest.password())
                 .map(user -> ResponseEntity.ok(user))
                 .orElse(ResponseEntity.status(HttpStatus.UNAUTHORIZED).build());

@@ -1,7 +1,7 @@
 <div class="container-fluid py-4">
   <div class="d-flex justify-content-between align-items-center mb-4">
     <h2 class="mb-0">Product Management</h2>
-    <button class="btn btn-dark" (click)="navigateToAddProduct()">+ Add Product</button>
+    <button class="btn btn-dark" (click)="openModal(null)">+ Add Product</button>
   </div>
 
   <div *ngIf="isLoading" class="text-center py-5">
@@ -26,7 +26,7 @@
         <tr *ngFor="let product of products">
           <td>
             <img
-              [src]="product.imageUrl"
+              [src]="product.imageUrl || 'assets/placeholder.png'"
               [alt]="product.name"
               class="product-image"
               style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px"
@@ -36,12 +36,14 @@
           <td>${{ product.price }}</td>
           <td>{{ product.category }}</td>
           <td>
-            <span class="badge bg-success">{{ product.status }}</span>
+            <span class="badge" [ngClass]="product.active ? 'bg-success' : 'bg-secondary'">
+              {{ product.active ? 'Active' : 'Inactive' }}
+            </span>
           </td>
           <td class="text-center">
             <button
               class="btn btn-sm btn-outline-primary me-2"
-              (click)="editProduct(product.id!)"
+              (click)="openModal(product)"
               title="Edit Product"
             >
               <i class="bi bi-pencil"></i>
@@ -62,4 +64,11 @@
       <p>No products found. Click "Add Product" to create one.</p>
     </div>
   </div>
+
+  <app-product-form-modal
+    *ngIf="showModal"
+    [product]="selectedProduct"
+    (save)="handleSave($event)"
+    (close)="closeModal()"
+  ></app-product-form-modal>
 </div>

@@ -1,20 +1,20 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { FormsModule } from '@angular/forms'; // <--- IMPORT THIS
+import { FormsModule } from '@angular/forms';
 import { CartService } from '../../services/cart.service';
 
 @Component({
   selector: 'app-menu',
   standalone: true,
-  imports: [CommonModule, FormsModule], // <--- ADD HERE
+  imports: [CommonModule, FormsModule],
   templateUrl: './menu.html',
   styleUrls: ['./menu.css'],
 })
 export class Menu implements OnInit {
   // Data containers
-  allProducts: any[] = []; // The master list from DB
-  filteredProducts: any[] = []; // The list currently displayed
+  allProducts: any[] = [];
+  filteredProducts: any[] = [];
 
   isLoading = true;
   orderStatus: { type: 'success' | 'error'; message: string } | null = null;
@@ -34,7 +34,7 @@ export class Menu implements OnInit {
     this.http.get<any[]>('http://localhost:8080/api/products').subscribe({
       next: (data) => {
         this.allProducts = data;
-        this.filteredProducts = data; // Show all initially
+        this.filteredProducts = data;
         this.isLoading = false;
       },
       error: (error) => {
