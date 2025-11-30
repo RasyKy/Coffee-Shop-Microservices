@@ -1,27 +1,24 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-// 1. Remove Router, Import the Modal
-import { ProductFormModal } from '../product-form-modal/product-form-modal';
+import { ProductFormModal } from '../product-form-modal/product-form-modal'; // Ensure path is correct
 import { ProductService, Product } from '../../services/product.service';
 
 @Component({
   selector: 'app-admin-product-management',
   standalone: true,
-  // 2. Add the Modal to imports
   imports: [CommonModule, ProductFormModal],
   templateUrl: './admin-product-management.html',
   styleUrls: ['./admin-product-management.css'],
 })
 export class AdminProductManagement implements OnInit {
+  private productService = inject(ProductService);
+
   products: Product[] = [];
   isLoading = true;
 
-  // 3. New State variables for the Modal
+  // Modal State
   showModal = false;
   selectedProduct: Product | null = null;
-
-  // 4. Removed Router from constructor
-  constructor(private productService: ProductService) {}
 
   ngOnInit(): void {
     this.loadProducts();
@@ -41,40 +38,61 @@ export class AdminProductManagement implements OnInit {
     });
   }
 
-  // 5. Open Modal Logic
-  // If product is passed, we are Editing. If null, we are Adding.
   openModal(product: Product | null): void {
     this.selectedProduct = product;
     this.showModal = true;
   }
 
-  // 6. Close Modal Logic
   closeModal(): void {
     this.showModal = false;
     this.selectedProduct = null;
   }
 
-  // 7. Handle the Save event from the Modal
-  handleSave(productData: any): void {
-    // If we have an ID, we are updating
-    if (this.selectedProduct && this.selectedProduct.id) {
-      this.productService.updateProduct(this.selectedProduct.id, productData).subscribe({
+  // --- THE SAVING LOGIC ---
+  handleSave(productData: any) {
+    this.isLoading = true;
+
+    const formData = new FormData();
+
+    // 1. Basic Fields
+    formData.append('name', productData.name);
+    formData.append('description', productData.description);
+    formData.append('price', productData.price.toString());
+    formData.append('category', productData.category);
+
+    // 2. Status: Convert boolean to string for backend
+    formData.append('active', String(productData.active));
+
+    // 3. Image: Only append if it's a new File object
+    // If it's null (no change) or a string (existing URL), skip it.
+    if (productData.image && productData.image instanceof File) {
+      formData.append('image', productData.image);
+    }
+
+    // 4. Send Request
+    if (productData.id) {
+      // Update
+      this.productService.updateProduct(productData.id, formData).subscribe({
         next: () => {
-          this.loadProducts(); // Refresh list
+          this.loadProducts();
           this.closeModal();
-          alert('Product updated successfully');
         },
-        error: (err) => alert('Failed to update product'),
+        error: (err) => {
+          console.error('Update failed', err);
+          this.isLoading = false;
+        },
       });
     } else {
-      // If no ID, we are creating
-      this.productService.createProduct(productData).subscribe({
+      // Create
+      this.productService.createProduct(formData).subscribe({
         next: () => {
-          this.loadProducts(); // Refresh list
+          this.loadProducts();
           this.closeModal();
-          alert('Product created successfully');
         },
-        error: (err) => alert('Failed to create product'),
+        error: (err) => {
+          console.error('Create failed', err);
+          this.isLoading = false;
+        },
       });
     }
   }
@@ -82,13 +100,8 @@ export class AdminProductManagement implements OnInit {
   deleteProduct(productId: string, productName: string): void {
     if (confirm(`Are you sure you want to delete "${productName}"?`)) {
       this.productService.deleteProduct(productId).subscribe({
-        next: () => {
-          this.loadProducts();
-        },
-        error: (error) => {
-          console.error('Error deleting product:', error);
-          alert('Failed to delete product.');
-        },
+        next: () => this.loadProducts(),
+        error: (err) => alert('Failed to delete product.'),
       });
     }
   }

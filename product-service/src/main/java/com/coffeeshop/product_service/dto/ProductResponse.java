@@ -9,6 +9,6 @@ public record ProductResponse(
         BigDecimal price,
         String category,
         String imageUrl,
-        String status
+        Boolean active
 ) {
 }

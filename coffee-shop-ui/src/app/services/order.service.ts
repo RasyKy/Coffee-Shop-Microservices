@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, tap, catchError, throwError } from 'rxjs';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -9,17 +9,33 @@ export class OrderService {
   private http = inject(HttpClient);
   private apiUrl = 'http://localhost:8080/api/order';
 
-  placeOrder(orderRequest: any): Observable<any> {
-    // ... (Keep existing placeOrder logic) ...
-    return this.http.post(this.apiUrl, orderRequest);
+  placeOrder(orderRequest: any): Observable<string> {
+    return this.http.post<string>(this.apiUrl, orderRequest);
   }
 
-  // --- NEW METHOD ---
-  getOrders(userId: string): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/${userId}`);
+  getOrders(userId: string): Observable<Order[]> {
+    return this.http.get<Order[]>(`${this.apiUrl}/${userId}`);
   }
 
-  getAllOrdersAdmin(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/admin/all`);
+  getAllOrdersAdmin(): Observable<Order[]> {
+    return this.http.get<Order[]>(`${this.apiUrl}/admin/all`);
   }
+}
+
+// --- FLEXIBLE INTERFACE ---
+export interface Order {
+  id?: string;
+  orderNumber: string;
+  userId: string;
+  createdDate: string;
+  // We make both optional so TypeScript doesn't complain
+  orderLineItems?: OrderLineItem[]; // Correct DTO name
+  orderLineItemsList?: OrderLineItem[]; // Old Entity name (fallback)
+}
+
+export interface OrderLineItem {
+  id?: string;
+  skuCode: string;
+  price: number;
+  quantity: number;
 }

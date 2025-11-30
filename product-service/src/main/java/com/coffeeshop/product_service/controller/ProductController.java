@@ -6,6 +6,7 @@ import com.coffeeshop.product_service.service.ProductService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -14,11 +15,14 @@ import java.util.List;
 @RequestMapping("/api/products")
 @RequiredArgsConstructor
 public class ProductController {
+
     private final ProductService productService;
 
-    @PostMapping
+    // --- FIX 1: Use @ModelAttribute and MULTIPART_FORM_DATA_VALUE ---
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
-    public ProductResponse createProduct(@RequestBody @Valid ProductRequest productRequest) {
+    public ProductResponse createProduct(@ModelAttribute @Valid ProductRequest productRequest) {
+        // Now 'productRequest' contains the MultipartFile image
         return productService.createProduct(productRequest);
     }
 
@@ -28,23 +32,21 @@ public class ProductController {
         return productService.getAllProducts();
     }
 
-    // NEW: Get single product by ID
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     public ProductResponse getProductById(@PathVariable String id) {
         return productService.getProductById(id);
     }
 
-    // NEW: Update product
-    @PutMapping("/{id}")
+    // --- FIX 2: Update method also needs MULTIPART handling ---
+    @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public ProductResponse updateProduct(
             @PathVariable String id,
-            @RequestBody @Valid ProductRequest productRequest) {
+            @ModelAttribute @Valid ProductRequest productRequest) {
         return productService.updateProduct(id, productRequest);
     }
 
-    // NEW: Delete product
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteProduct(@PathVariable String id) {

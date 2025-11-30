@@ -1,88 +1,125 @@
-<div class="container py-5">
-  <h1 class="text-center mb-4 fw-bold text-primary">Our Product Selection</h1>
+<div class="container-fluid bg-light min-vh-100 py-5">
+  <div class="container">
+    <div class="text-center mb-5">
+      <h6 class="text-uppercase text-muted fw-bold ls-wide">Our Menu</h6>
+      <h1 class="fw-bold display-5 text-dark">Fresh & Delicious</h1>
+    </div>
 
-  <div class="row justify-content-center mb-5">
-    <div class="col-md-8">
-      <div class="card p-3 shadow-sm border-0 bg-light">
-        <div class="row g-3">
-          <div class="col-md-8">
-            <div class="input-group">
-              <span class="input-group-text bg-white border-end-0">
-                <i class="bi bi-search text-muted"></i>
-              </span>
-              <input
-                type="text"
-                class="form-control border-start-0 ps-0"
-                placeholder="Search for coffee, pastries..."
-                [(ngModel)]="searchQuery"
-                (input)="onFilterChange()"
-              />
-            </div>
+    <div class="row justify-content-center mb-5">
+      <div class="col-lg-10">
+        <div
+          class="bg-white p-3 rounded-pill shadow-sm d-flex flex-column flex-md-row align-items-center gap-3"
+        >
+          <div
+            class="input-group border rounded-pill overflow-hidden flex-grow-1"
+            style="max-width: 400px"
+          >
+            <span class="input-group-text bg-white border-0 ps-3">
+              <i class="bi bi-search text-secondary"></i>
+            </span>
+            <input
+              type="text"
+              class="form-control border-0 shadow-none"
+              placeholder="Search coffee, pastries..."
+              [(ngModel)]="searchQuery"
+              (input)="onFilterChange()"
+            />
           </div>
 
-          <div class="col-md-4">
-            <select class="form-select" [(ngModel)]="selectedCategory" (change)="onFilterChange()">
-              <option *ngFor="let cat of categories" [value]="cat">
-                {{ cat }}
-              </option>
-            </select>
+          <div class="d-none d-md-block vr mx-2"></div>
+
+          <div
+            class="d-flex gap-2 overflow-auto w-100 justify-content-center justify-content-md-start pb-2 pb-md-0 no-scrollbar"
+          >
+            @for (cat of categories; track cat) {
+            <button
+              class="btn rounded-pill px-4 fw-medium transition-all"
+              [ngClass]="selectedCategory === cat ? 'btn-dark' : 'btn-light text-secondary'"
+              (click)="selectCategory(cat)"
+            >
+              {{ cat }}
+            </button>
+            }
           </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <div *ngIf="isLoading" class="text-center py-5">
-    <div class="spinner-border text-primary" role="status">
-      <span class="visually-hidden">Loading...</span>
+    @if (isLoading) {
+    <div class="d-flex justify-content-center py-5">
+      <div class="spinner-border text-primary opacity-50" role="status"></div>
+    </div>
+    } @if (!isLoading && filteredProducts.length === 0) {
+    <div class="text-center py-5 fade-in">
+      <div class="bg-white d-inline-block p-4 rounded-circle shadow-sm mb-3">
+        <i class="bi bi-cup-hot fs-1 text-muted opacity-50"></i>
+      </div>
+      <h4 class="text-dark fw-bold">No products found</h4>
+      <p class="text-secondary mb-4">We couldn't find what you're looking for.</p>
+      <button
+        class="btn btn-outline-dark rounded-pill px-4"
+        (click)="searchQuery = ''; selectCategory('All')"
+      >
+        Clear Filters
+      </button>
+    </div>
+    }
+
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 row-cols-xl-4 g-4">
+      @for (product of filteredProducts; track product.id) {
+      <div class="col fade-in">
+        <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden product-card group">
+          <div class="position-relative overflow-hidden bg-light" style="height: 240px">
+            <img
+              [src]="product.imageUrl || '/assets/placeholder.png'"
+              [alt]="product.name"
+              class="w-100 h-100 object-fit-cover transition-transform"
+              (error)="product.imageUrl = '/assets/placeholder.png'"
+            />
+            <span
+              class="position-absolute top-0 start-0 m-3 badge bg-white text-dark shadow-sm rounded-pill fw-normal px-3"
+            >
+              {{ product.category }}
+            </span>
+          </div>
+
+          <div class="card-body p-4 d-flex flex-column">
+            <div class="d-flex justify-content-between align-items-start mb-2">
+              <h5 class="fw-bold text-dark mb-0">{{ product.name }}</h5>
+              <span class="fs-5 fw-bold text-primary">${{ product.price }}</span>
+            </div>
+
+            <p class="text-secondary small line-clamp-2 mb-4 flex-grow-1">
+              {{ product.description || 'No description available for this item.' }}
+            </p>
+
+            <button
+              class="btn btn-dark w-100 rounded-pill py-2 d-flex align-items-center justify-content-center gap-2 btn-hover-scale"
+              (click)="addToCart(product)"
+            >
+              <i class="bi bi-plus-lg"></i> Add to Order
+            </button>
+          </div>
+        </div>
+      </div>
+      }
     </div>
   </div>
 
-  <div *ngIf="!isLoading && filteredProducts.length === 0" class="text-center py-5">
-    <i class="bi bi-cup-hot display-1 text-muted"></i>
-    <h3 class="mt-3 text-muted">No products found</h3>
-    <p>Try adjusting your search or category.</p>
-    <button
-      class="btn btn-outline-primary"
-      (click)="searchQuery = ''; selectedCategory = 'All'; onFilterChange()"
+  <div
+    class="toast-container position-fixed bottom-0 start-50 translate-middle-x p-3"
+    style="z-index: 1050"
+  >
+    <div
+      class="toast align-items-center text-white bg-dark border-0 shadow-lg rounded-pill px-3"
+      role="alert"
+      [class.show]="toast.show"
+      style="transition: all 0.3s ease"
     >
-      Clear Filters
-    </button>
-  </div>
-
-  <div class="row row-cols-1 row-cols-md-3 g-4" *ngIf="!isLoading && filteredProducts.length > 0">
-    <div class="col" *ngFor="let product of filteredProducts">
-      <div class="card h-100 shadow-sm border-0 product-card">
-        <div class="position-relative overflow-hidden">
-          <img
-            class="card-img-top object-fit-cover"
-            [src]="product.imageUrl || '/assets/fallback.png'"
-            (error)="product.imageUrl = '/assets/fallback.png'"
-            alt="{{ product.name }}"
-            style="height: 220px; transition: transform 0.3s"
-          />
-          <span class="badge bg-dark position-absolute top-0 end-0 m-2 opacity-75">
-            {{ product.category }}
-          </span>
-        </div>
-
-        <div class="card-body">
-          <div class="d-flex justify-content-between align-items-start mb-2">
-            <h5 class="card-title fw-bold mb-0">{{ product.name }}</h5>
-            <h5 class="text-primary fw-bold mb-0">${{ product.price }}</h5>
-          </div>
-          <p class="card-text text-muted small">
-            {{ product.description }}
-          </p>
-        </div>
-
-        <div class="card-footer bg-white border-top-0 pb-3 pt-0">
-          <button
-            class="btn btn-primary w-100 d-flex align-items-center justify-content-center gap-2"
-            (click)="addToCart(product)"
-          >
-            <i class="bi bi-cart-plus"></i> Add to Cart
-          </button>
+      <div class="d-flex">
+        <div class="toast-body d-flex align-items-center gap-2">
+          <i class="bi bi-check-circle-fill text-success"></i>
+          {{ toast.message }}
         </div>
       </div>
     </div>

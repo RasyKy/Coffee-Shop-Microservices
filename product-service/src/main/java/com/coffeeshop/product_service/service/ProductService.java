@@ -7,23 +7,38 @@ import com.coffeeshop.product_service.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class ProductService {
+
     private final ProductRepository productRepository;
 
+    // FIX 4: Use the Docker volume path
+    private final String UPLOAD_DIR = "/app/images/";
+
     public ProductResponse createProduct(ProductRequest productRequest) {
+        // 1. Handle Image Upload
+        String imageUrl = saveImage(productRequest.getImage());
+
+        // 2. Map DTO to Entity
         Product product = Product.builder()
-                .name(productRequest.name())
-                .description(productRequest.description())
-                .price(productRequest.price())
-                .category(productRequest.category())
-                .imageUrl(productRequest.imageUrl())
-                .status(productRequest.status() != null ? productRequest.status() : "Available")
+                .name(productRequest.getName())
+                .description(productRequest.getDescription())
+                .price(productRequest.getPrice())
+                .category(productRequest.getCategory())
+                .imageUrl(imageUrl)
+                .active(productRequest.getActive() != null ? productRequest.getActive() : true)
                 .build();
 
         productRepository.save(product);
@@ -41,7 +56,6 @@ public class ProductService {
     public ProductResponse getProductById(String id) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Product not found with id: " + id));
-        log.info("Product {} retrieved", id);
         return mapToProductResponse(product);
     }
 
@@ -49,12 +63,18 @@ public class ProductService {
         Product existingProduct = productRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Product not found with id: " + id));
 
-        existingProduct.setName(productRequest.name());
-        existingProduct.setDescription(productRequest.description());
-        existingProduct.setPrice(productRequest.price());
-        existingProduct.setCategory(productRequest.category());
-        existingProduct.setImageUrl(productRequest.imageUrl());
-        existingProduct.setStatus(productRequest.status() != null ? productRequest.status() : "Available");
+        // 1. Update fields
+        existingProduct.setName(productRequest.getName());
+        existingProduct.setDescription(productRequest.getDescription());
+        existingProduct.setPrice(productRequest.getPrice());
+        existingProduct.setCategory(productRequest.getCategory());
+        existingProduct.setActive(productRequest.getActive());
+
+        // 2. Handle Image Update logic
+        if (productRequest.getImage() != null && !productRequest.getImage().isEmpty()) {
+            String newImageUrl = saveImage(productRequest.getImage());
+            existingProduct.setImageUrl(newImageUrl);
+        }
 
         productRepository.save(existingProduct);
         log.info("Product {} updated", id);
@@ -69,6 +89,35 @@ public class ProductService {
         log.info("Product {} deleted", id);
     }
 
+    // --- Helper to Save File to Disk ---
+    private String saveImage(MultipartFile file) {
+        if (file == null || file.isEmpty()) {
+            return null;
+        }
+
+        try {
+            // Ensure directory exists
+            Path uploadPath = Paths.get(UPLOAD_DIR);
+            if (!Files.exists(uploadPath)) {
+                Files.createDirectories(uploadPath);
+            }
+
+            // Generate unique filename
+            String filename = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
+            Path filePath = uploadPath.resolve(filename);
+
+            // Save file
+            Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+
+            // FIX 5: Return relative path for NGINX
+            return "images/" + filename;
+
+        } catch (IOException e) {
+            log.error("Could not save image file", e);
+            throw new RuntimeException("Could not save image file");
+        }
+    }
+
     private ProductResponse mapToProductResponse(Product product) {
         return new ProductResponse(
                 product.getId(),
@@ -77,7 +126,6 @@ public class ProductService {
                 product.getPrice(),
                 product.getCategory(),
                 product.getImageUrl(),
-                product.getStatus()
-        );
+                product.getActive());
     }
 }

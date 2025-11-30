@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
@@ -8,8 +8,7 @@ export interface Product {
   description: string;
   price: number;
   category: string;
-  imageUrl: string;
-  status: string;
+  imageUrl?: string;
   active?: boolean;
 }
 
@@ -17,9 +16,8 @@ export interface Product {
   providedIn: 'root',
 })
 export class ProductService {
+  private http = inject(HttpClient);
   private apiUrl = 'http://localhost:8080/api/products';
-
-  constructor(private http: HttpClient) {}
 
   getAllProducts(): Observable<Product[]> {
     return this.http.get<Product[]>(this.apiUrl);
@@ -29,13 +27,15 @@ export class ProductService {
     return this.http.get<Product>(`${this.apiUrl}/${id}`);
   }
 
-  createProduct(product: Product): Observable<Product> {
-    return this.http.post<Product>(this.apiUrl, product);
+  // --- FIX START: Change type to FormData ---
+  createProduct(product: FormData): Observable<any> {
+    return this.http.post(this.apiUrl, product);
   }
 
-  updateProduct(id: string, product: Product): Observable<Product> {
-    return this.http.put<Product>(`${this.apiUrl}/${id}`, product);
+  updateProduct(id: string, product: FormData): Observable<any> {
+    return this.http.put(`${this.apiUrl}/${id}`, product);
   }
+  // --- FIX END ---
 
   deleteProduct(id: string): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);

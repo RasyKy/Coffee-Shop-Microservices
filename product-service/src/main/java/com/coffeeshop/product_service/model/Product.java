@@ -22,5 +22,5 @@ public class Product {
     private BigDecimal price;
     private String category;
     private String imageUrl;
-    private String status;
+    private Boolean active; 
 }

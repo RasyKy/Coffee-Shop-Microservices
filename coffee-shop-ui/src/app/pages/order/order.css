@@ -1,7 +1,12 @@
-.card {
-  border-radius: 10px;
-  border: 1px solid #eee;
+.ls-wide {
+  letter-spacing: 1.5px;
 }
-.card-header {
-  border-bottom: 1px solid #f0f0f0;
+
+.border-white {
+  border-color: #fff !important;
+}
+
+/* Remove last border in the items list */
+li:last-child {
+  border-bottom: none !important;
 }

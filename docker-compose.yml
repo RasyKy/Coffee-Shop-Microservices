@@ -1,3 +1,4 @@
+version: '3'
 services:
   # --- INFRASTRUCTURE ---
   eureka-server:
@@ -40,6 +41,9 @@ services:
     depends_on:
       - eureka-server
       - db-product
+    volumes:
+      # FIX 1: Mount the shared volume to the backend
+      - product-images:/app/images
     environment:
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
       - EUREKA_INSTANCE_PREFER_IP_ADDRESS=true
@@ -64,6 +68,9 @@ services:
     container_name: coffee-shop-ui
     ports:
       - "4200:80"
+    volumes:
+      # FIX 2: Mount the SAME volume to NGINX's image folder
+      - product-images:/usr/share/nginx/html/images
 
   # --- DATABASES ---
   db-user:
@@ -95,3 +102,4 @@ volumes:
   mongo-user-data:
   mongo-product-data:
   mongo-order-data:
+  product-images: # FIX 3: Define the shared volume

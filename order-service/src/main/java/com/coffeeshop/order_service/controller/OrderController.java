@@ -1,11 +1,11 @@
 package com.coffeeshop.order_service.controller;
 
 import com.coffeeshop.order_service.dto.OrderRequest;
-import com.coffeeshop.order_service.model.Order; // Returning Entity for simplicity
+import com.coffeeshop.order_service.dto.OrderResponse;
 import com.coffeeshop.order_service.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*; // Includes GetMapping
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
 import java.util.List;
@@ -27,14 +27,13 @@ public class OrderController {
 
     @GetMapping("/admin/all")
     @ResponseStatus(HttpStatus.OK)
-    public List<Order> getAllOrders() {
+    public List<OrderResponse> getAllOrders() {
         return orderService.getAllOrders();
     }
 
-    // --- NEW ENDPOINT ---
     @GetMapping("/{userId}")
     @ResponseStatus(HttpStatus.OK)
-    public List<Order> getOrders(@PathVariable String userId) {
+    public List<OrderResponse> getOrders(@PathVariable String userId) {
         return orderService.getOrders(userId);
     }
 }

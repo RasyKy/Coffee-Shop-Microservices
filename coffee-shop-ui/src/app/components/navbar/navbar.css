@@ -1,73 +1,74 @@
-/* Navbar Base */
-.navbar {
-  border-bottom: 1px solid #e5e5e5;
-  padding: 0.75rem 0;
+/* Glassmorphism Effect for Navbar */
+.bg-white\/90 {
+  background-color: rgba(255, 255, 255, 0.95) !important;
+  backdrop-filter: blur(10px);
 }
 
 /* Logo Styling */
-.navbar-brand {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-weight: 600;
-  color: #2c2c2c;
-  text-decoration: none;
-}
-
 .logo-icon {
-  font-size: 1.5rem;
+  width: 32px;
+  height: 32px;
+  background: #3b82f6; /* Modern Blue, or use your brand color */
 }
 
 .logo-text {
-  font-size: 1.25rem;
-  color: #2c2c2c;
+  font-family: 'Inter', sans-serif;
+  letter-spacing: -0.5px;
+  font-size: 1.2rem;
+  color: #1e293b;
 }
 
-.navbar-brand:hover .logo-text {
-  color: #6c4e31;
-}
-
-/* Nav Links */
-.navbar-nav {
-  gap: 2rem;
-}
-
+/* Navigation Links */
 .nav-link {
-  color: #6c757d;
   font-weight: 500;
-  padding: 0.5rem 0;
-  border-bottom: 2px solid transparent;
+  color: #64748b !important;
   transition: all 0.2s ease;
+  position: relative;
 }
 
 .nav-link:hover {
-  color: #2c2c2c;
+  color: #0f172a !important;
 }
 
 .nav-link.active {
-  color: #2c2c2c;
-  border-bottom-color: #6c4e31;
+  color: #3b82f6 !important;
+  font-weight: 600;
 }
 
-/* Icon Buttons */
-.btn-icon {
+/* Add a small dot under active link */
+.nav-link.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 4px;
+  height: 4px;
+  background-color: #3b82f6;
+  border-radius: 50%;
+}
+
+/* Circular Action Buttons */
+.btn-circle {
   width: 40px;
   height: 40px;
-  padding: 0;
-  border: none;
-  background: transparent;
-  color: #2c2c2c;
-  font-size: 1.5rem;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 50%;
+  border: 1px solid #e2e8f0;
+  background: white;
+  color: #1e293b;
   transition: all 0.2s ease;
+  cursor: pointer;
+  text-decoration: none;
 }
 
-.btn-icon:hover {
-  background-color: #f5f5f5;
-  color: #6c4e31;
+.btn-circle:hover,
+.btn-circle[aria-expanded='true'] {
+  background-color: #f1f5f9;
+  border-color: #cbd5e1;
+  transform: translateY(-1px);
 }
 
 /* Cart Badge */
@@ -75,59 +76,26 @@
   position: absolute;
   top: -2px;
   right: -2px;
-  background-color: #dc3545;
+  background-color: #ef4444;
   color: white;
   font-size: 0.65rem;
-  font-weight: 600;
-  padding: 0.15rem 0.4rem;
-  border-radius: 10px;
+  font-weight: bold;
+  height: 18px;
   min-width: 18px;
-  text-align: center;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid white;
 }
 
-/* Dropdown */
-.dropdown-menu {
-  border: 1px solid #e5e5e5;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  border-radius: 8px;
-  margin-top: 0.5rem;
-  min-width: 200px;
-}
-
-.dropdown-item-text {
-  padding: 0.5rem 1rem;
-  color: #2c2c2c;
-}
-
+/* Dropdown tweaks */
 .dropdown-item {
-  padding: 0.5rem 1rem;
-  color: #6c757d;
-  transition: all 0.2s ease;
+  font-size: 0.9rem;
+  padding: 8px 16px;
 }
 
-.dropdown-item:hover {
-  background-color: #f5f5f5;
-  color: #2c2c2c;
-}
-
-.dropdown-item.text-danger:hover {
-  background-color: #fff5f5;
-  color: #dc3545;
-}
-
-/* Mobile Responsiveness */
-@media (max-width: 991px) {
-  .navbar-nav {
-    gap: 0;
-    margin-top: 1rem;
-  }
-
-  .nav-link {
-    padding: 0.75rem 0;
-  }
-
-  .d-flex.gap-3 {
-    margin-top: 1rem;
-    justify-content: flex-start;
-  }
+.dropdown-item:active {
+  background-color: #e2e8f0;
+  color: #0f172a;
 }

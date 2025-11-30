@@ -5,11 +5,13 @@
 
       <!-- Backend Error Alert -->
       <!-- Added a shake animation class or bold text for visibility -->
-      <div *ngIf="errorMessage" class="alert alert-danger d-flex align-items-center" role="alert">
-        <i class="bi bi-exclamation-triangle-fill me-2"></i>
-        <!-- Optional Bootstrap Icon -->
-        <div>{{ errorMessage }}</div>
-      </div>
+      @if (errorMessage) {
+        <div class="alert alert-danger d-flex align-items-center" role="alert">
+          <i class="bi bi-exclamation-triangle-fill me-2"></i>
+          <!-- Optional Bootstrap Icon -->
+          <div>{{ errorMessage }}</div>
+        </div>
+      }
 
       <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
         <!-- Email -->
@@ -25,47 +27,53 @@
               (loginForm.get('email')?.dirty || loginForm.get('email')?.touched)
             "
             placeholder="name@example.com"
-          />
-          <!-- Specific Error Messages -->
-          <div class="invalid-feedback" *ngIf="loginForm.get('email')?.hasError('required')">
-            Email is required.
+            />
+            <!-- Specific Error Messages -->
+            @if (loginForm.get('email')?.hasError('required')) {
+              <div class="invalid-feedback">
+                Email is required.
+              </div>
+            }
+            @if (loginForm.get('email')?.hasError('email')) {
+              <div class="invalid-feedback">
+                Please enter a valid email address (e.g., user@mail.com).
+              </div>
+            }
           </div>
-          <div class="invalid-feedback" *ngIf="loginForm.get('email')?.hasError('email')">
-            Please enter a valid email address (e.g., user@mail.com).
-          </div>
-        </div>
 
-        <!-- Password -->
-        <div class="mb-3">
-          <label for="password" class="form-label">Password</label>
-          <input
-            type="password"
-            id="password"
-            class="form-control"
-            formControlName="password"
+          <!-- Password -->
+          <div class="mb-3">
+            <label for="password" class="form-label">Password</label>
+            <input
+              type="password"
+              id="password"
+              class="form-control"
+              formControlName="password"
             [class.is-invalid]="
               loginForm.get('password')?.invalid &&
               (loginForm.get('password')?.dirty || loginForm.get('password')?.touched)
             "
-          />
-          <div class="invalid-feedback">Password is required.</div>
-        </div>
+              />
+              <div class="invalid-feedback">Password is required.</div>
+            </div>
 
-        <!-- Submit Button -->
-        <div class="d-grid gap-2 mt-4">
-          <button type="submit" class="btn btn-primary btn-lg" [disabled]="isLoading">
-            <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2"></span>
-            Sign In
-          </button>
-        </div>
-      </form>
+            <!-- Submit Button -->
+            <div class="d-grid gap-2 mt-4">
+              <button type="submit" class="btn btn-primary btn-lg" [disabled]="isLoading">
+                @if (isLoading) {
+                  <span class="spinner-border spinner-border-sm me-2"></span>
+                }
+                Sign In
+              </button>
+            </div>
+          </form>
 
-      <div class="text-center mt-3">
-        <small class="text-muted"
-          >New here?
-          <a routerLink="/register" class="text-decoration-none">Create an account</a></small
-        >
+          <div class="text-center mt-3">
+            <small class="text-muted"
+              >New here?
+              <a routerLink="/register" class="text-decoration-none">Create an account</a></small
+              >
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
-  </div>
-</div>

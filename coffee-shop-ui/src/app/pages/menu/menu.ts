@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, inject } from '@angular/core';
+import { CommonModule } from '@angular/common'; // Needed for ngClass
 import { HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { CartService } from '../../services/cart.service';
@@ -12,19 +12,20 @@ import { CartService } from '../../services/cart.service';
   styleUrls: ['./menu.css'],
 })
 export class Menu implements OnInit {
-  // Data containers
+  private http = inject(HttpClient);
+  private cartService = inject(CartService);
+
   allProducts: any[] = [];
   filteredProducts: any[] = [];
-
   isLoading = true;
-  orderStatus: { type: 'success' | 'error'; message: string } | null = null;
 
-  // Filter controls
+  // Filters
   searchQuery: string = '';
   selectedCategory: string = 'All';
-  categories: string[] = ['All', 'Drink', 'Pastry'];
+  categories: string[] = ['All', 'Drink', 'Pastry', 'Food']; // Added 'Food' as example
 
-  constructor(private http: HttpClient, private cartService: CartService) {}
+  // Toast State (Replaces Alert)
+  toast = { show: false, message: '' };
 
   ngOnInit(): void {
     this.loadProducts();
@@ -49,16 +50,19 @@ export class Menu implements OnInit {
     const query = this.searchQuery.toLowerCase().trim();
 
     this.filteredProducts = this.allProducts.filter((product) => {
-      // 1. Check Name Search
       const matchesSearch = product.name.toLowerCase().includes(query);
-
-      // 2. Check Category (Case insensitive comparison)
       const matchesCategory =
         this.selectedCategory === 'All' ||
         product.category?.toLowerCase() === this.selectedCategory.toLowerCase();
 
       return matchesSearch && matchesCategory;
     });
+  }
+
+  // Helper to switch category via Pills
+  selectCategory(category: string) {
+    this.selectedCategory = category;
+    this.onFilterChange();
   }
 
   addToCart(product: any): void {
@@ -68,7 +72,15 @@ export class Menu implements OnInit {
       price: product.price,
       imageUrl: product.imageUrl,
     });
-    // Optional: Use a toast instead of alert for better UX
-    alert(`${product.name} added to cart!`);
+
+    // Show Custom Toast
+    this.showToast(`${product.name} added to cart`);
+  }
+
+  private showToast(message: string) {
+    this.toast = { show: true, message };
+    setTimeout(() => {
+      this.toast.show = false;
+    }, 3000); // Hide after 3 seconds
   }
 }

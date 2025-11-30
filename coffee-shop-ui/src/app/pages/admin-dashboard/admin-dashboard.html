@@ -1,74 +1,139 @@
-<div class="container py-5">
-  <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2 class="fw-bold">Admin Dashboard</h2>
-    <a routerLink="/admin/products" class="btn btn-outline-dark">
-      <i class="bi bi-cup-hot-fill"></i> Manage Products
-    </a>
-  </div>
+<div class="container-fluid py-5 bg-light min-vh-100">
+  <div class="container">
+    <div class="d-flex justify-content-between align-items-end mb-5">
+      <div>
+        <h6 class="text-uppercase text-muted fw-bold mb-1 ls-wide">Overview</h6>
+        <h2 class="fw-bold text-dark mb-0">Admin Dashboard</h2>
+      </div>
+      <a routerLink="/admin/products" class="btn btn-dark rounded-pill px-4 shadow-sm">
+        <i class="bi bi-box-seam me-2"></i> Manage Products
+      </a>
+    </div>
 
-  <div *ngIf="isLoading" class="text-center py-5">
-    <div class="spinner-border text-primary" role="status"></div>
-  </div>
-
-  <div *ngIf="!isLoading">
+    @if (isLoading) {
+    <div class="d-flex justify-content-center align-items-center py-5" style="min-height: 400px">
+      <div class="spinner-border text-primary opacity-50" role="status"></div>
+    </div>
+    } @else {
     <div class="row g-4 mb-5">
       <div class="col-md-4">
-        <div class="card bg-success text-white h-100 shadow-sm">
-          <div class="card-body text-center">
-            <h3>${{ totalRevenue.toFixed(2) }}</h3>
-            <p class="mb-0">Total Revenue</p>
+        <div class="card border-0 shadow-sm rounded-4 h-100">
+          <div class="card-body p-4 d-flex align-items-center">
+            <div class="icon-square bg-success-subtle text-success me-4 rounded-4">
+              <i class="bi bi-currency-dollar fs-3"></i>
+            </div>
+            <div>
+              <p class="text-muted mb-1 text-uppercase fw-bold fs-7">Total Revenue</p>
+              <h3 class="fw-bold mb-0 text-dark">${{ totalRevenue.toFixed(2) }}</h3>
+            </div>
           </div>
         </div>
       </div>
+
       <div class="col-md-4">
-        <div class="card bg-primary text-white h-100 shadow-sm">
-          <div class="card-body text-center">
-            <h3>{{ totalOrders }}</h3>
-            <p class="mb-0">Total Orders</p>
+        <div class="card border-0 shadow-sm rounded-4 h-100">
+          <div class="card-body p-4 d-flex align-items-center">
+            <div class="icon-square bg-primary-subtle text-primary me-4 rounded-4">
+              <i class="bi bi-bag-check fs-3"></i>
+            </div>
+            <div>
+              <p class="text-muted mb-1 text-uppercase fw-bold fs-7">Total Orders</p>
+              <h3 class="fw-bold mb-0 text-dark">{{ totalOrders }}</h3>
+            </div>
           </div>
         </div>
       </div>
+
       <div class="col-md-4">
-        <div class="card bg-warning text-dark h-100 shadow-sm">
-          <div class="card-body text-center">
-            <h3>{{ popularProduct }}</h3>
-            <p class="mb-0">Best Seller</p>
+        <div class="card border-0 shadow-sm rounded-4 h-100">
+          <div class="card-body p-4 d-flex align-items-center">
+            <div class="icon-square bg-warning-subtle text-warning me-4 rounded-4">
+              <i class="bi bi-trophy fs-3"></i>
+            </div>
+            <div class="overflow-hidden">
+              <p class="text-muted mb-1 text-uppercase fw-bold fs-7">Best Seller</p>
+              <h3 class="fw-bold mb-0 text-dark text-truncate">{{ popularProduct }}</h3>
+            </div>
           </div>
         </div>
       </div>
     </div>
 
-    <h4 class="mb-3">Recent Orders</h4>
-    <div class="table-responsive shadow-sm rounded">
-      <table class="table table-hover bg-white mb-0">
-        <thead class="table-light">
-          <tr>
-            <th>Order #</th>
-            <th>User</th>
-            <th>Items</th>
-            <th>Total</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let order of orders.slice().reverse()">
-            <td>
-              <small>{{ order.orderNumber.substring(0, 8) }}...</small>
-            </td>
-            <td>{{ order.userId }}</td>
-            <td>
-              <ul class="list-unstyled mb-0 small">
-                <li *ngFor="let item of order.orderLineItemsList">
-                  {{ item.quantity }}x {{ getProductName(item.skuCode) }}
-                </li>
-              </ul>
-            </td>
-            <td class="fw-bold">${{ getOrderTotal(order).toFixed(2) }}</td>
-          </tr>
-          <tr *ngIf="orders.length === 0">
-            <td colspan="4" class="text-center p-4">No orders received yet.</td>
-          </tr>
-        </tbody>
-      </table>
+    <div class="card border-0 shadow-sm rounded-4 mb-5 overflow-hidden">
+      <div class="card-header bg-white border-0 pt-4 px-4 pb-0">
+        <h5 class="fw-bold mb-0">Sales Analytics</h5>
+      </div>
+      <div class="card-body p-4">
+        <div style="height: 350px">
+          <canvas
+            baseChart
+            [data]="barChartData"
+            [options]="barChartOptions"
+            [legend]="barChartLegend"
+            [type]="'bar'"
+          >
+          </canvas>
+        </div>
+      </div>
     </div>
+
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+      <div class="card-header bg-white border-0 pt-4 px-4 pb-2">
+        <h5 class="fw-bold mb-0">Recent Orders</h5>
+      </div>
+      <div class="table-responsive">
+        <table class="table align-middle table-hover mb-0">
+          <thead class="bg-light">
+            <tr>
+              <th class="ps-4 text-uppercase text-secondary fs-7 fw-bold border-0 py-3">
+                Order ID
+              </th>
+              <th class="text-uppercase text-secondary fs-7 fw-bold border-0 py-3">Date</th>
+              <th class="text-uppercase text-secondary fs-7 fw-bold border-0 py-3">Items</th>
+              <th class="text-end pe-4 text-uppercase text-secondary fs-7 fw-bold border-0 py-3">
+                Total
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (order of orders.slice().reverse(); track $index) {
+            <tr>
+              <td class="ps-4 py-3">
+                <span class="badge bg-light text-dark border font-monospace">
+                  #{{ order.orderNumber ? order.orderNumber.substring(0, 8) : 'ERR' }}
+                </span>
+              </td>
+              <td class="py-3 text-secondary">
+                {{ order.createdDate ? (order.createdDate | date : 'mediumDate') : 'No Date' }}
+              </td>
+              <td class="py-3">
+                <div class="d-flex flex-column gap-1">
+                  @for (item of (order.orderLineItems || order.orderLineItemsList); track $index) {
+                  <span class="text-dark small">
+                    <span class="fw-bold">{{ item.quantity }}x</span>
+                    {{ getProductName(item.skuCode) }}
+                  </span>
+                  }
+                </div>
+              </td>
+              <td class="text-end pe-4 py-3 fw-bold text-dark">
+                ${{ getOrderTotal(order).toFixed(2) }}
+              </td>
+            </tr>
+            } @empty {
+            <tr>
+              <td colspan="4" class="text-center py-5">
+                <div class="text-muted">
+                  <i class="bi bi-inbox fs-1 opacity-25"></i>
+                  <p class="mt-2">No orders found.</p>
+                </div>
+              </td>
+            </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+    }
   </div>
 </div>

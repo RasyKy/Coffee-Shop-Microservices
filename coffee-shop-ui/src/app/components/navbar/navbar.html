@@ -1,96 +1,93 @@
-<div *ngIf="authService.currentUser()?.role === 'ADMIN'" class="bg-dark text-white py-2 small">
-  <div class="container-fluid px-4 d-flex justify-content-between align-items-center">
-    <span>
-      <i class="bi bi-shield-lock-fill me-2"></i>
-      Admin Account
-    </span>
-    <div>
-      <a routerLink="/admin" class="text-white text-decoration-none fw-bold me-3">
-        <i class="bi bi-plus-circle me-1"></i> Admin Dashboard
+@if (authService.currentUser()?.role === 'ADMIN') {
+  <div class="admin-bar bg-dark text-white py-2">
+    <div class="container d-flex justify-content-between align-items-center">
+      <span class="small fw-medium d-flex align-items-center">
+        <span class="badge bg-danger me-2 rounded-pill">ADMIN</span>
+        Signed in as {{ authService.currentUser().email }}
+      </span>
+      <a routerLink="/admin" class="btn btn-sm btn-outline-light rounded-pill px-3 py-0" style="font-size: 0.75rem;">
+        Dashboard <i class="bi bi-arrow-right ms-1"></i>
       </a>
     </div>
   </div>
-</div>
+}
 
-<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
-  <div class="container-fluid px-4">
-    <a class="navbar-brand d-flex align-items-center" routerLink="/">
-      <span class="logo-icon">☕</span>
-      <span class="logo-text">Brew Haven</span>
+<nav class="navbar navbar-expand-lg sticky-top navbar-light bg-white/90 border-bottom">
+  <div class="container">
+    <a class="navbar-brand d-flex align-items-center gap-2" routerLink="/">
+      <div class="logo-icon bg-primary text-white rounded-3 d-flex align-items-center justify-content-center">
+        <i class="bi bi-cup-hot-fill"></i>
+      </div>
+      <span class="logo-text fw-bold ls-tight">Brew Haven</span>
     </a>
 
-    <button
-      class="navbar-toggler"
-      type="button"
-      data-bs-toggle="collapse"
-      data-bs-target="#navbarNav"
-    >
+    <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
       <span class="navbar-toggler-icon"></span>
     </button>
 
     <div class="collapse navbar-collapse" id="navbarNav">
-      <ul class="navbar-nav mx-auto">
+      
+      <ul class="navbar-nav mx-auto mb-2 mb-lg-0 gap-lg-4">
         <li class="nav-item">
-          <a
-            class="nav-link"
-            routerLink="/"
-            routerLinkActive="active"
-            [routerLinkActiveOptions]="{ exact: true }"
-          >
-            Home
-          </a>
+          <a class="nav-link" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Home</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" routerLink="/menu" routerLinkActive="active"> Menu </a>
+          <a class="nav-link" routerLink="/menu" routerLinkActive="active">Menu</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" routerLink="/my-orders" routerLinkActive="active"> Orders </a>
+          <a class="nav-link" routerLink="/my-orders" routerLinkActive="active">Orders</a>
         </li>
       </ul>
 
-      <div class="d-flex align-items-center gap-3">
-        <button class="btn btn-icon position-relative" routerLink="/cart">
-          <i class="bi bi-cart3"></i>
-          <span class="cart-badge" *ngIf="cartService.getItemCount() > 0">
-            {{ cartService.getItemCount() }}
-          </span>
-        </button>
-
-        <div class="dropdown" *ngIf="authService.currentUser()">
-          <button
-            class="btn btn-icon"
-            type="button"
-            data-bs-toggle="dropdown"
-            aria-expanded="false"
-          >
-            <i class="bi bi-person-circle"></i>
-          </button>
-          <ul class="dropdown-menu dropdown-menu-end">
-            <li>
-              <span class="dropdown-item-text fw-semibold">
-                {{ authService.currentUser().username || authService.currentUser().email }}
-              </span>
-            </li>
-
-            <li *ngIf="authService.currentUser()?.role === 'ADMIN'">
-              <a class="dropdown-item text-primary" routerLink="/admin">
-                <i class="bi bi-gear-fill me-2"></i>Admin Dashboard
-              </a>
-            </li>
-
-            <li><hr class="dropdown-divider" /></li>
-            <li><a class="dropdown-item" routerLink="/my-orders">My Orders</a></li>
-            <li><a class="dropdown-item" routerLink="/profile">Profile Settings</a></li>
-            <li><hr class="dropdown-divider" /></li>
-            <li>
-              <button class="dropdown-item text-danger" (click)="logout()">Logout</button>
-            </li>
-          </ul>
-        </div>
-
-        <a routerLink="/login" class="btn btn-icon" *ngIf="!authService.currentUser()">
-          <i class="bi bi-person-circle"></i>
+      <div class="d-flex align-items-center gap-2 mt-3 mt-lg-0">
+        
+        <a routerLink="/cart" class="btn-circle position-relative" title="View Cart">
+          <i class="bi bi-bag"></i> @if (cartService.getItemCount() > 0) {
+            <span class="cart-badge fade-in">
+              {{ cartService.getItemCount() }}
+            </span>
+          }
         </a>
+
+        @if (authService.currentUser()) {
+          <div class="dropdown">
+            <button class="btn-circle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <i class="bi bi-person"></i>
+            </button>
+            
+            <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 rounded-4 mt-2 p-2">
+              <li class="px-3 py-2">
+                <small class="text-muted d-block">Signed in as</small>
+                <div class="fw-bold text-dark text-truncate" style="max-width: 200px;">
+                  {{ authService.currentUser().username || authService.currentUser().email }}
+                </div>
+              </li>
+              <li><hr class="dropdown-divider"></li>
+              
+              @if (authService.currentUser()?.role === 'ADMIN') {
+                <li>
+                  <a class="dropdown-item rounded-3 mb-1 text-primary fw-medium" routerLink="/admin">
+                    <i class="bi bi-speedometer2 me-2"></i>Admin Dashboard
+                  </a>
+                </li>
+              }
+              
+              <li><a class="dropdown-item rounded-3 mb-1" routerLink="/my-orders"><i class="bi bi-receipt me-2"></i>My Orders</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li>
+                <button class="dropdown-item rounded-3 text-danger" (click)="logout()">
+                  <i class="bi bi-box-arrow-right me-2"></i>Logout
+                </button>
+              </li>
+            </ul>
+          </div>
+        } 
+        
+        @else {
+          <a routerLink="/login" class="btn btn-dark rounded-pill px-4 btn-sm fw-bold">
+            Log In
+          </a>
+        }
       </div>
     </div>
   </div>
